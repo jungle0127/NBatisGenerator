@@ -88,7 +88,20 @@ namespace BatisGenerator.biz
                 selectInterfaceDefinationBuilder.Append(" ");
                 selectInterfaceDefinationBuilder.Append(primaryKey);
                 selectInterfaceDefinationBuilder.Append(");\n\n");
+
+                //Find Count
+
+                selectInterfaceDefinationBuilder.Append("		");
+                selectInterfaceDefinationBuilder.Append("int GetFindCount(");
+                selectInterfaceDefinationBuilder.Append(primaryKeyDatatype);
+                selectInterfaceDefinationBuilder.Append(" ");
+                selectInterfaceDefinationBuilder.Append(primaryKey);
+                selectInterfaceDefinationBuilder.Append(");\n\n");
             }
+            
+            
+
+
             //FindAll
             selectInterfaceDefinationBuilder.Append("		IList<");
             selectInterfaceDefinationBuilder.Append(this.formatedTableName);
@@ -109,15 +122,28 @@ namespace BatisGenerator.biz
             {
                 if (this.tableTypeMap[this.tableName].ToString() == "VIEW" || this.primaryKeyMap.ContainsKey(this.tableName) && columnName != this.primaryKeyMap[this.tableName].ToString())
                 {
-                    selectInterfaceDefinationBuilder.Append(this.getSelectInterfaceFindByItem(columnName, this.formatedTableName));
-                    selectInterfaceDefinationBuilder.Append(this.getSelectInterfaceFindByItem(columnName, this.formatedTableName,true));
+                    selectInterfaceDefinationBuilder.Append(this.getSelectInterfaceFindByItem(columnName));
+                    selectInterfaceDefinationBuilder.Append(this.getSelectInterfaceFindByItem(columnName, true));
+                    selectInterfaceDefinationBuilder.Append(this.getFindByCountItem(columnName));
                 }
             }
             
             return selectInterfaceDefinationBuilder.ToString();
         }
 
-        private string getSelectInterfaceFindByItem(string columnName,string formatedTableName,bool isPagination = false)
+        private string getFindByCountItem(string columnName)
+        {
+            StringBuilder itemBuilder = new StringBuilder();
+            itemBuilder.Append("		");
+            itemBuilder.Append("int FindCountBy");
+            itemBuilder.Append(CommonUtil.formateString(columnName));
+            itemBuilder.Append("(");
+            itemBuilder.Append(this.formatedTableName);
+            itemBuilder.Append(" obj);\n\n");
+            return itemBuilder.ToString();
+        }
+
+        private string getSelectInterfaceFindByItem(string columnName,bool isPagination = false)
         {
             StringBuilder itemBuilder = new StringBuilder();
             itemBuilder.Append("		IList<");

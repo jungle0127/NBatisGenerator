@@ -86,6 +86,12 @@ namespace BatisGenerator.biz
             selectBuilder.Append("			" + this.formatedTableName + " result = this.sqlMapper.QueryForObject<" + this.formatedTableName + ">(stmtId, id);\n");
             selectBuilder.Append("			return result;\n");
             selectBuilder.Append("        }\n");
+            //Find Count
+            selectBuilder.Append("		public int GetFindCount(Int64 id) {\n");
+            selectBuilder.Append("			String stmtId = \"" + this.formatedTableName + ".GetFindCount\";\n");
+            selectBuilder.Append("			int result = this.sqlMapper.QueryForObject<int>(stmtId, id);\n");
+            selectBuilder.Append("			return result;\n");
+            selectBuilder.Append("		}\n");
             //FindAll
             selectBuilder.Append("		public IList<" + this.formatedTableName + "> FindAll() {\n");
             selectBuilder.Append("			String stmtId = \"" + this.formatedTableName + ".FindAll\";\n");
@@ -123,6 +129,18 @@ namespace BatisGenerator.biz
                     selectBuilder.Append("			IList<" + this.formatedTableName + "> result = this.sqlMapper.QueryForList<" + this.formatedTableName + ">(stmtId, obj);\n");
                     selectBuilder.Append("			return result;\n");
                     selectBuilder.Append("        }\n");
+                    //FindBy Count
+                    selectBuilder.Append("		public int FindCountBy");
+                    selectBuilder.Append(CommonUtil.formateString(columnName));
+                    selectBuilder.Append("(");
+                    selectBuilder.Append(this.formatedTableName);
+                    selectBuilder.Append(" obj){\n");
+                    selectBuilder.Append("			String stmtId = \"" + this.formatedTableName + ".GetFindBy");
+                    selectBuilder.Append(CommonUtil.formateString(columnName));
+                    selectBuilder.Append("Count\";\n");
+                    selectBuilder.Append("			int result = this.sqlMapper.QueryForObject<int>(stmtId, obj);\n");
+                    selectBuilder.Append("			return result;\n");
+                    selectBuilder.Append("		}\n");
                 }
             }
 

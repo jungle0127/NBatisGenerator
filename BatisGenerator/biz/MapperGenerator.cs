@@ -116,9 +116,20 @@ namespace BatisGenerator.biz
             selectBuilder.Append("			SELECT * FROM " + this.tableName + "\n");
             selectBuilder.Append("		</select>\n");
 
+            // findall with order by 
+
+            selectBuilder.Append("		<select id=\"" + this.formatedTableName + ".DescendOrderFindAll\" resultMap=\"FullResultMap\">\n");
+            selectBuilder.Append("			SELECT * FROM " + this.tableName + " ORDER BY id DESC\n");
+            selectBuilder.Append("		</select>\n");
+
             //findall pagination
             selectBuilder.Append("		<select id=\"" + this.formatedTableName + ".FindAllPagination\" parameterClass=\"" + this.formatedTableName + "Pagination\" resultMap=\"FullResultMap\">\n");
             selectBuilder.Append("			SELECT * FROM " + this.tableName + " limit #Limit# offset #Offset# \n");
+            selectBuilder.Append("		</select>\n");
+
+            // find all pagination with order by 
+            selectBuilder.Append("		<select id=\"" + this.formatedTableName + ".DescendOrderFindAllPagination\" parameterClass=\"" + this.formatedTableName + "Pagination\" resultMap=\"FullResultMap\">\n");
+            selectBuilder.Append("			SELECT * FROM " + this.tableName + " ORDER BY id desc limit #Limit# offset #Offset# \n");
             selectBuilder.Append("		</select>\n");
 
             //FindBy
@@ -130,26 +141,78 @@ namespace BatisGenerator.biz
                     //<select id="RoleHasRights.Find" parameterClass="RoleHasRights" resultMap="FullResultMap" extends="RoleHasRights.FindAll">
 
                     selectBuilder.Append(this.getSelectFindStatementItem(columnName, CommonUtil.formateString(columnName), this.formatedTableName, this.formatedTableName));
+                    selectBuilder.Append(this.getSelectFindStatementItem(columnName, CommonUtil.formateString(columnName), this.formatedTableName, this.formatedTableName,false,true));
+                    selectBuilder.Append(this.getCountFindStatementItem(columnName,CommonUtil.formateString(columnName)));
                     //selectBuilder.Append(this.getSelectFindStatementItem(columnName, CommonUtil.formateString(columnName), this.formatedTableName + "Pagination", this.formatedTableName + "Pagination", true));
                 }
                 else
                 {
                     //<select id="RoleHasRights.FindByRoleid" parameterClass="Int64" resultMap="FullResultMap" extends="RoleHasRights.FindAll">
                     selectBuilder.Append(this.getSelectFindByStatementItem(columnName,csharpDatatype,this.formatedTableName,this.formatedTableName));
+                    selectBuilder.Append(this.getSelectFindByStatementItem(columnName, csharpDatatype, this.formatedTableName, this.formatedTableName,false,true));
                     selectBuilder.Append(this.getSelectFindByStatementItem(columnName, csharpDatatype, this.formatedTableName + "Pagination", this.formatedTableName + "Pagination", true));
+                    selectBuilder.Append(this.getSelectFindByStatementItem(columnName, csharpDatatype, this.formatedTableName + "Pagination", this.formatedTableName + "Pagination", true,true));
+                    selectBuilder.Append(this.getCountFindByStatementItem(columnName, CommonUtil.formateString(columnName)));
                 }
 
             }
 
             return selectBuilder.ToString();
         }
-
-        private string getSelectFindStatementItem(string columnName, string valueName, string formatedClass, string statementId,bool isPagination = false)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="columnName"></param>
+        /// <param name="valueName"></param>
+        /// <returns></returns>
+        private string getCountFindStatementItem(string columnName,string valueName)
+        {
+            StringBuilder countFindBuilder = new StringBuilder();
+            countFindBuilder.Append("		<select id=\"" + this.formatedTableName + ".GetFindCount\" resultClass=\"System.Int32\">\n");
+            countFindBuilder.Append("			SELECT count(*) FROM " + this.tableName + " WHERE ");
+            countFindBuilder.Append(this.tableName);
+            countFindBuilder.Append(".");
+            countFindBuilder.Append(columnName);
+            countFindBuilder.Append("=#");
+            countFindBuilder.Append(valueName);
+            countFindBuilder.Append("#\n");
+            countFindBuilder.Append("		</select>\n");
+            return countFindBuilder.ToString();
+        }
+        private string getCountFindByStatementItem(string columnName,string valueName)
+        {
+            StringBuilder countFindBuilder = new StringBuilder();
+            countFindBuilder.Append("		<select id=\"" + this.formatedTableName + ".GetFindBy" + valueName + "Count\" resultClass=\"System.Int32\">\n");
+            countFindBuilder.Append("			SELECT count(*) FROM " + this.tableName + " WHERE ");
+            countFindBuilder.Append(this.tableName);
+            countFindBuilder.Append(".");
+            countFindBuilder.Append(columnName);
+            countFindBuilder.Append("=#");
+            countFindBuilder.Append(valueName);
+            countFindBuilder.Append("#\n");
+            countFindBuilder.Append("		</select>\n");
+            return countFindBuilder.ToString();                                                                                                                            
+        }
+        private string getSelectFindStatementItem(
+            string columnName, 
+            string valueName, 
+            string formatedClass, 
+            string statementId,
+            bool isPagination = false,
+            bool isOrder = false
+            )
         {
             StringBuilder selectStatementItemBuilder = new StringBuilder();
             selectStatementItemBuilder.Append("		<select id=\"");
             selectStatementItemBuilder.Append(statementId);
-            selectStatementItemBuilder.Append(".Find\" parameterClass=\"");
+            if (isOrder)
+            {
+                selectStatementItemBuilder.Append(".DescendOrderFind\" parameterClass=\"");
+            }
+            else
+            {
+                selectStatementItemBuilder.Append(".Find\" parameterClass=\"");
+            }
             selectStatementItemBuilder.Append(formatedClass);
             selectStatementItemBuilder.Append("\" resultMap=\"FullResultMap\" extends=\"");
             selectStatementItemBuilder.Append(this.formatedTableName);
@@ -163,6 +226,11 @@ namespace BatisGenerator.biz
             selectStatementItemBuilder.Append(valueName);
             selectStatementItemBuilder.Append("#");
 
+            if (isOrder)
+            {
+                selectStatementItemBuilder.Append(" ORDER BY id DESC");
+            }
+
             if (isPagination)
             {
                 selectStatementItemBuilder.Append(" limit #Limit# offset #Offset# ");
@@ -174,13 +242,26 @@ namespace BatisGenerator.biz
             return selectStatementItemBuilder.ToString();
         }
 
-        private string getSelectFindByStatementItem(string columnName, string csharpDatatype,
-            string formatedClass,string statementId,bool isPagination=false)
+        private string getSelectFindByStatementItem(
+            string columnName, 
+            string csharpDatatype, 
+            string formatedClass,
+            string statementId,
+            bool isPagination=false,
+            bool isOrder = false
+            )
         {
             StringBuilder selectStatementItemBuilder = new StringBuilder();
             selectStatementItemBuilder.Append("		<select id=\"");
             selectStatementItemBuilder.Append(statementId);
-            selectStatementItemBuilder.Append(".FindBy");
+            if (isOrder)
+            {
+                selectStatementItemBuilder.Append(".DescendOrderFindBy");
+            }
+            else
+            {
+                selectStatementItemBuilder.Append(".FindBy");
+            }
             selectStatementItemBuilder.Append(CommonUtil.formateString(columnName));
             selectStatementItemBuilder.Append("\"");
             selectStatementItemBuilder.Append(" parameterClass=\"");
@@ -203,11 +284,16 @@ namespace BatisGenerator.biz
             if (isPagination)
             {
                 selectStatementItemBuilder.Append(" = #" + CommonUtil.formateString(columnName) + "#");
-                selectStatementItemBuilder.Append(" limit #Limit# offset #Offset# ");
+                if (isOrder)
+                    selectStatementItemBuilder.Append(" ORDER BY id DESC limit #Limit# offset #Offset# ");
+                else
+                    selectStatementItemBuilder.Append(" LIMIT #Limit# OFFSET #Offset# ");
             }
             else
             {
                 selectStatementItemBuilder.Append(" = #value#");
+                if (isOrder)
+                    selectStatementItemBuilder.Append(" ORDER BY id DESC");
             }
             selectStatementItemBuilder.Append("\n");
 

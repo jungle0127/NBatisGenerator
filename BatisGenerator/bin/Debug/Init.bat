@@ -6,3 +6,4 @@ del Mapper\*.xml
 del Mapper\usp\*.xml
 del Entity\*.cs
 del Entity\usp\*.cs
+del Entity\Pagination\*.cs
