@@ -107,10 +107,20 @@ namespace BatisGenerator.biz
             selectInterfaceDefinationBuilder.Append(this.formatedTableName);
             selectInterfaceDefinationBuilder.Append("> FindAll();\n\n");
 
+            //DescendOrderFindAll
+            selectInterfaceDefinationBuilder.Append("		IList<");
+            selectInterfaceDefinationBuilder.Append(this.formatedTableName);
+            selectInterfaceDefinationBuilder.Append("> DescendOrderFindAll();\n\n");
+
             //FindAllPagination
             selectInterfaceDefinationBuilder.Append("		IList<");
             selectInterfaceDefinationBuilder.Append(this.formatedTableName);
             selectInterfaceDefinationBuilder.Append("> PaginationFindAll(" + this.formatedTableName + "Pagination obj);\n\n");
+            
+            //DescendOrderPaginationFindAll
+            selectInterfaceDefinationBuilder.Append("		IList<");
+            selectInterfaceDefinationBuilder.Append(this.formatedTableName);
+            selectInterfaceDefinationBuilder.Append("> DescendOrderPaginationFindAll(" + this.formatedTableName + "Pagination obj);\n\n");
 
             //QuickFindAll
             selectInterfaceDefinationBuilder.Append("		IList<");
@@ -123,7 +133,9 @@ namespace BatisGenerator.biz
                 if (this.tableTypeMap[this.tableName].ToString() == "VIEW" || this.primaryKeyMap.ContainsKey(this.tableName) && columnName != this.primaryKeyMap[this.tableName].ToString())
                 {
                     selectInterfaceDefinationBuilder.Append(this.getSelectInterfaceFindByItem(columnName));
+                    selectInterfaceDefinationBuilder.Append(this.getDescendOrderSelectInterfaceFindByItem(columnName));
                     selectInterfaceDefinationBuilder.Append(this.getSelectInterfaceFindByItem(columnName, true));
+                    selectInterfaceDefinationBuilder.Append(this.getDescendOrderSelectInterfaceFindByItem(columnName, true));
                     selectInterfaceDefinationBuilder.Append(this.getFindByCountItem(columnName));
                 }
             }
@@ -172,6 +184,37 @@ namespace BatisGenerator.biz
             itemBuilder.Append(");\n\n");
             return itemBuilder.ToString();
         }
+
+        private string getDescendOrderSelectInterfaceFindByItem(string columnName, bool isPagination = false)
+        {
+            StringBuilder itemBuilder = new StringBuilder();
+            itemBuilder.Append("		IList<");
+            itemBuilder.Append(formatedTableName);
+            if (isPagination)
+            {
+                itemBuilder.Append("> DescendOrderPaginationFindBy");
+            }
+            else
+            {
+                itemBuilder.Append("> DescendOrderFindBy");
+            }
+            itemBuilder.Append(CommonUtil.formateString(columnName));
+            itemBuilder.Append("(");
+            if (isPagination)
+            {
+                itemBuilder.Append(this.formatedTableName);
+                itemBuilder.Append("Pagination obj");
+            }
+            else
+            {
+                itemBuilder.Append(this.dataTypeMapper.DataTypeMapper[columnInfoMap[columnName].ToString()].ToString());
+                itemBuilder.Append(" ");
+                itemBuilder.Append(columnName);
+            }
+            itemBuilder.Append(");\n\n");
+            return itemBuilder.ToString();
+        }
+
 
         private string getInsertInterface()
         {

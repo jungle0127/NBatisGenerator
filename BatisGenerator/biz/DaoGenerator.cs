@@ -92,6 +92,7 @@ namespace BatisGenerator.biz
             selectBuilder.Append("			int result = this.sqlMapper.QueryForObject<int>(stmtId, id);\n");
             selectBuilder.Append("			return result;\n");
             selectBuilder.Append("		}\n");
+
             //FindAll
             selectBuilder.Append("		public IList<" + this.formatedTableName + "> FindAll() {\n");
             selectBuilder.Append("			String stmtId = \"" + this.formatedTableName + ".FindAll\";\n");
@@ -99,9 +100,23 @@ namespace BatisGenerator.biz
             selectBuilder.Append("			return result;\n");
             selectBuilder.Append("        }\n");
 
+            //DescendOrderFindAll
+            selectBuilder.Append("		public IList<" + this.formatedTableName + "> DescendOrderFindAll() {\n");
+            selectBuilder.Append("			String stmtId = \"" + this.formatedTableName + ".DescendOrderFindAll\";\n");
+            selectBuilder.Append("			IList<" + this.formatedTableName + "> result = this.sqlMapper.QueryForList<" + this.formatedTableName + ">(stmtId, null);\n");
+            selectBuilder.Append("			return result;\n");
+            selectBuilder.Append("        }\n");
+
             //PaginationFindAll
             selectBuilder.Append("		public IList<" + this.formatedTableName + "> PaginationFindAll("+this.formatedTableName+"Pagination obj) {\n");
             selectBuilder.Append("			String stmtId = \"" + this.formatedTableName + ".FindAllPagination\";\n");
+            selectBuilder.Append("			IList<" + this.formatedTableName + "> result = this.sqlMapper.QueryForList<" + this.formatedTableName + ">(stmtId, obj);\n");
+            selectBuilder.Append("			return result;\n");
+            selectBuilder.Append("        }\n");
+
+            //DescendOrderPaginationFindAll
+            selectBuilder.Append("		public IList<" + this.formatedTableName + "> DescendOrderFindAllPagination(" + this.formatedTableName + "Pagination obj) {\n");
+            selectBuilder.Append("			String stmtId = \"" + this.formatedTableName + ".DescendOrderFindAllPagination\";\n");
             selectBuilder.Append("			IList<" + this.formatedTableName + "> result = this.sqlMapper.QueryForList<" + this.formatedTableName + ">(stmtId, obj);\n");
             selectBuilder.Append("			return result;\n");
             selectBuilder.Append("        }\n");
@@ -118,14 +133,27 @@ namespace BatisGenerator.biz
                 string csharpDatatype = this.dataTypeMapper.DataTypeMapper[columnInfoMap[columnName].ToString()].ToString();
                 if (this.tableTypeMap[this.tableName].ToString() == "VIEW" || this.primaryKeyMap.ContainsKey(this.tableName) && columnName != this.primaryKeyMap[this.tableName].ToString())
                 {
+                    //FindBy
                     selectBuilder.Append("		public IList<" + this.formatedTableName + "> FindBy" + CommonUtil.formateString(columnName) + "(" + csharpDatatype + " " + columnName + ") {\n");
                     selectBuilder.Append("			String stmtId = \"" + this.formatedTableName + ".FindBy" + CommonUtil.formateString(columnName) + "\";\n");
+                    selectBuilder.Append("			IList<" + this.formatedTableName + "> result = this.sqlMapper.QueryForList<" + this.formatedTableName + ">(stmtId, " + columnName + ");\n");
+                    selectBuilder.Append("			return result;\n");
+                    selectBuilder.Append("        }\n");
+                    //DescendOrderFindBy
+                    selectBuilder.Append("		public IList<" + this.formatedTableName + "> DescendOrderFindBy" + CommonUtil.formateString(columnName) + "(" + csharpDatatype + " " + columnName + ") {\n");
+                    selectBuilder.Append("			String stmtId = \"" + this.formatedTableName + ".DescendOrderFindBy" + CommonUtil.formateString(columnName) + "\";\n");
                     selectBuilder.Append("			IList<" + this.formatedTableName + "> result = this.sqlMapper.QueryForList<" + this.formatedTableName + ">(stmtId, " + columnName + ");\n");
                     selectBuilder.Append("			return result;\n");
                     selectBuilder.Append("        }\n");
                     //Pagination
                     selectBuilder.Append("		public IList<" + this.formatedTableName + "> PaginationFindBy" + CommonUtil.formateString(columnName) + "(" + this.formatedTableName + "Pagination obj) {\n");
                     selectBuilder.Append("			String stmtId = \"" + this.formatedTableName + "Pagination.FindBy" + CommonUtil.formateString(columnName) + "\";\n");
+                    selectBuilder.Append("			IList<" + this.formatedTableName + "> result = this.sqlMapper.QueryForList<" + this.formatedTableName + ">(stmtId, obj);\n");
+                    selectBuilder.Append("			return result;\n");
+                    selectBuilder.Append("        }\n");
+                    //DescendOrderPagination
+                    selectBuilder.Append("		public IList<" + this.formatedTableName + "> DescendOrderPaginationFindBy" + CommonUtil.formateString(columnName) + "(" + this.formatedTableName + "Pagination obj) {\n");
+                    selectBuilder.Append("			String stmtId = \"" + this.formatedTableName + "Pagination.DescendOrderFindBy" + CommonUtil.formateString(columnName) + "\";\n");
                     selectBuilder.Append("			IList<" + this.formatedTableName + "> result = this.sqlMapper.QueryForList<" + this.formatedTableName + ">(stmtId, obj);\n");
                     selectBuilder.Append("			return result;\n");
                     selectBuilder.Append("        }\n");
