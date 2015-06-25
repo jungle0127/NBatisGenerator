@@ -115,7 +115,7 @@ namespace BatisGenerator.biz
             selectBuilder.Append("        }\n");
 
             //DescendOrderPaginationFindAll
-            selectBuilder.Append("		public IList<" + this.formatedTableName + "> DescendOrderFindAllPagination(" + this.formatedTableName + "Pagination obj) {\n");
+            selectBuilder.Append("		public IList<" + this.formatedTableName + "> DescendOrderPaginationFindAll(" + this.formatedTableName + "Pagination obj) {\n");
             selectBuilder.Append("			String stmtId = \"" + this.formatedTableName + ".DescendOrderFindAllPagination\";\n");
             selectBuilder.Append("			IList<" + this.formatedTableName + "> result = this.sqlMapper.QueryForList<" + this.formatedTableName + ">(stmtId, obj);\n");
             selectBuilder.Append("			return result;\n");
